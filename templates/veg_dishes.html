@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">
+            {% if dish_type == 'chapati_curry' %}
+                Chapati + Curry Options
+            {% elif dish_type == 'paratha' %}
+                Paratha Options
+            {% else %}
+                Vegetarian Dishes
+            {% endif %}
+        </h1>
+        <p class="lead">Delicious vegetarian meals prepared with fresh ingredients</p>
+    </div>
+</section>
+
+<div class="container mt-5">
+    <div class="row g-4">
+        {% for dish in dishes %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="{% static 'images/cleaning/'|add:forloop.counter|add:'.jpg' %}" alt="Dish Image {{ forloop.counter }}" class="service-icon">
+                    </div>
+                    <h5 class="card-title text-center">{{ dish.name }}</h5>
+                    <p class="card-text text-muted">{{ dish.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <h4 class="mb-0 text-primary">₹{{ dish.price }}</h4>
+                        <button class="btn btn-primary" onclick="addToCart('{{ dish.name|escapejs }}', '{{ dish.price|escapejs }}')">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>No dishes available in this category.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{% url 'cooking_services' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Back to Cooking Services
+        </a>
+    </div>
+</div>
+
+<script>
+function addToCart(dishName, price) {
+    // You can implement cart functionality here
+    alert(`Added ${dishName} to cart! Price: ₹${price}`);
+}
+</script>
+{% endblock %}

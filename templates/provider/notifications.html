@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Provider Notifications{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between mb-4">
+        <h2><i class="fas fa-bell me-2"></i>Provider Notifications</h2>
+        <a href="{% url 'provider_dashboard' %}" class="btn btn-outline-primary">← Dashboard</a>
+    </div>
+    <div id="notificationsList" class="list-group">
+        {% for n in notifications %}
+        <div class="list-group-item {% if not n.is_read %}list-group-item-warning{% endif %}" data-id="{{ n.id }}">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>{{ n.title }}</h6>
+                    <p class="mb-1 small">{{ n.message }}</p>
+                    <small class="text-muted">{{ n.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                {% if not n.is_read %}
+                <form method="POST" action="{% url 'provider_mark_notification_read' n.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-dark">Mark read</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info" id="noNotifMsg">No notifications.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const list = document.getElementById('notificationsList');
+    const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(wsScheme + '://' + window.location.host + '/ws/notifications/');
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'notification' && data.notification) {
+            const noMsg = document.getElementById('noNotifMsg');
+            if (noMsg) noMsg.remove();
+            const n = data.notification;
+            const div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-warning';
+            div.innerHTML = '<div><h6>' + n.title + '</h6><p class="mb-1 small">' + n.message +
+                '</p><small class="text-muted">' + n.created_at + '</small></div>';
+            list.prepend(div);
+        }
+    };
+})();
+</script>
+{% endblock %}

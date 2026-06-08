@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+
+{% block title %}SMART URS Analytics Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .analytics-page {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        min-height: 100vh;
+        padding: 2rem 0 3rem;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, #050226 0%, #1a0a4e 50%, #2d1b69 100%);
+        border-radius: 16px;
+        padding: 2rem 2.5rem;
+        color: #fff;
+        box-shadow: 0 10px 40px rgba(5, 2, 38, 0.25);
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .dashboard-header p {
+        opacity: 0.85;
+        margin-bottom: 0;
+        font-size: 0.95rem;
+    }
+
+    .kpi-card {
+        border: none;
+        border-radius: 16px;
+        color: #fff;
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -20%;
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .kpi-card .kpi-icon {
+        font-size: 2rem;
+        opacity: 0.9;
+        margin-bottom: 0.75rem;
+    }
+
+    .kpi-card .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .kpi-card .kpi-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+    }
+
+    .kpi-bookings { background: linear-gradient(135deg, #0b1959 0%, #b571f9 100%); }
+    .kpi-completed { background: linear-gradient(135deg, #02335e 0%, #043d88 100%); }
+    .kpi-revenue { background: linear-gradient(135deg, #110135 0%, #39034b 100%); }
+    .kpi-providers { background: linear-gradient(135deg, #010e1c 0%, #002f5e 100%); }
+    .kpi-users { background: linear-gradient(135deg, #0f0225 0%, #090000fe 100%); }
+
+    .section-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        height: 100%;
+        background: #fff;
+    }
+
+    .section-card .card-header {
+        background: #fff;
+        border-bottom: 1px solid #eef0f4;
+        padding: 1.25rem 1.5rem;
+        border-radius: 16px 16px 0 0 !important;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #050226;
+    }
+
+    .section-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 280px;
+    }
+
+    .analytics-table {
+        margin-bottom: 0;
+    }
+
+    .analytics-table thead th {
+        background: #f8f9fc;
+        border-bottom: 2px solid #eef0f4;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 0.85rem 1rem;
+    }
+
+    .analytics-table tbody td {
+        padding: 0.85rem 1rem;
+        vertical-align: middle;
+        border-color: #eef0f4;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.75em;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-progress { background: #cce5ff; color: #004085; }
+    .status-completed { background: #d4edda; color: #155724; }
+
+    .peak-hour-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transition: width 0.5s ease;
+    }
+
+    .provider-rank {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .revenue-stat {
+        text-align: center;
+        padding: 1.25rem;
+        border-radius: 12px;
+        background: #f8f9fc;
+    }
+
+    .revenue-stat .amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #050226;
+    }
+
+    .revenue-stat .label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+    }
+
+    .service-rank-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eef0f4;
+        gap: 0.75rem;
+    }
+
+    .service-rank-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: #f0f2f8;
+    }
+
+    .service-rank-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .service-rank-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .service-rank-item:last-child {
+        border-bottom: none;
+    }
+
+    .badge-count {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .admin-badge {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        padding: 0.35rem 1rem;
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="analytics-page">
+    <div class="container-fluid px-4">
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h1>🏠 SMART URS Analytics Dashboard</h1>
+                <p>Real-time business insights for your Smart Home Services Platform</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="admin-badge"><i class="fas fa-shield-alt me-1"></i> Admin Only</span>
+                <a href="/admin/" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-cog me-1"></i> Django Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl col-md-6 col-sm-6">
+                <div class="kpi-card kpi-bookings">
+                    <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="kpi-value">{{ total_bookings }}</div>
+                    <div class="kpi-label">Total Bookings</div>
+                </div>
+            </div>
+            <div class="col-xl col-md-6 col-sm-6">
+                <div class="kpi-card kpi-completed">
+                    <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="kpi-value">{{ completed_services }}</div>
+                    <div class="kpi-label">Completed Services</div>
+                </div>
+            </div>
+            <div class="col-xl col-md-6 col-sm-6">
+                <div class="kpi-card kpi-revenue">
+                    <div class="kpi-icon"><i class="fas fa-rupee-sign"></i></div>
+                    <div class="kpi-value">₹{{ total_revenue|floatformat:0 }}</div>
+                    <div class="kpi-label">Total Revenue</div>
+                </div>
+            </div>
+            <div class="col-xl col-md-6 col-sm-6">
+                <div class="kpi-card kpi-providers">
+                    <div class="kpi-icon"><i class="fas fa-user-tie"></i></div>
+                    <div class="kpi-value">{{ active_providers }}</div>
+                    <div class="kpi-label">Active Service Providers</div>
+                </div>
+            </div>
+            <div class="col-xl col-md-6 col-sm-6">
+                <div class="kpi-card kpi-users">
+                    <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                    <div class="kpi-value">{{ registered_users }}</div>
+                    <div class="kpi-label">Registered Users</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>📊 Most Popular Services
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="popularServicesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>📈 Booking Status Distribution
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="statusPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Line Chart + Revenue Insights -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>💰 Monthly Revenue Trend
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-coins me-2 text-primary"></i>💰 Revenue Insights
+                    </div>
+                    <div class="card-body">
+                        <div class="revenue-stat mb-3">
+                            <div class="amount">₹{{ daily_revenue|floatformat:2 }}</div>
+                            <div class="label">Daily Revenue</div>
+                        </div>
+                        <div class="revenue-stat mb-3">
+                            <div class="amount">₹{{ monthly_revenue|floatformat:2 }}</div>
+                            <div class="label">Monthly Revenue</div>
+                        </div>
+                        <div class="revenue-stat">
+                            <div class="amount">₹{{ total_revenue|floatformat:2 }}</div>
+                            <div class="label">Total Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Sections Row -->
+        <div class="row g-4 mb-4">
+            <!-- Popular Services List -->
+            <div class="col-lg-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-star me-2 text-warning"></i>📊 Top 5 Services
+                    </div>
+                    <div class="card-body">
+                        {% if popular_services %}
+                            {% for service in popular_services %}
+                            <div class="service-rank-item">
+                                <div class="service-rank-thumb">
+                                    {% include 'partials/service_image.html' with service=service %}
+                                </div>
+                                <div class="service-rank-info">
+                                    <span class="provider-rank me-2">{{ forloop.counter }}</span>
+                                    {{ service.name }}
+                                </div>
+                                <span class="badge-count">{{ service.booking_count }} bookings</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted mb-0">No service booking data available yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Providers -->
+            <div class="col-lg-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-award me-2 text-warning"></i>⭐ Top Performing Providers
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table analytics-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Provider</th>
+                                        <th>Rating</th>
+                                        <th>Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for provider in top_providers %}
+                                    <tr>
+                                        <td><span class="provider-rank">{{ forloop.counter }}</span></td>
+                                        <td>{{ provider.name }}</td>
+                                        <td>
+                                            <i class="fas fa-star text-warning"></i>
+                                            {{ provider.rating|floatformat:1 }}
+                                        </td>
+                                        <td>{{ provider.completed_bookings }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-muted text-center">No providers found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peak Hours -->
+            <div class="col-lg-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-clock me-2 text-info"></i>⏰ Peak Booking Hours
+                    </div>
+                    <div class="card-body">
+                        {% if peak_hours_display %}
+                            {% for peak in peak_hours_display %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span><i class="far fa-clock me-1"></i> {{ peak.label }}</span>
+                                    <strong>{{ peak.count }} bookings</strong>
+                                </div>
+                                <div class="peak-hour-bar" style="width: {% widthratio peak.count max_peak_count 100 %}%;"></div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted mb-0">No booking time data available yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <i class="fas fa-list-alt me-2 text-primary"></i>📅 Recent Bookings
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table analytics-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>User Name</th>
+                                        <th>Service Name</th>
+                                        <th>Provider Name</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in recent_bookings %}
+                                    <tr>
+                                        <td>{{ booking.user.name }}</td>
+                                        <td>
+                                            {% if booking.service %}
+                                                {{ booking.service.name }}
+                                            {% elif booking.dish %}
+                                                {{ booking.dish.name }} (Veg)
+                                            {% elif booking.non_veg_dish %}
+                                                {{ booking.non_veg_dish.name }} (Non-Veg)
+                                            {% else %}
+                                                Cooking Service
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ booking.provider.name|default:"N/A" }}</td>
+                                        <td>{{ booking.booking_date|default:booking.date|default:"—" }}</td>
+                                        <td>{{ booking.booking_time|default:booking.time|default:"—" }}</td>
+                                        <td>
+                                            {% if booking.status == 'Pending' %}
+                                                <span class="status-badge status-pending">{{ booking.status }}</span>
+                                            {% elif booking.status == 'In Progress' %}
+                                                <span class="status-badge status-progress">{{ booking.status }}</span>
+                                            {% else %}
+                                                <span class="status-badge status-completed">{{ booking.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-muted text-center py-4">No bookings recorded yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.color = '#6c757d';
+
+    const popularLabels = {{ chart_popular_labels|safe }};
+    const popularData = {{ chart_popular_data|safe }};
+    const statusLabels = {{ chart_status_labels|safe }};
+    const statusData = {{ chart_status_data|safe }};
+    const revenueLabels = {{ chart_revenue_labels|safe }};
+    const revenueData = {{ chart_revenue_data|safe }};
+
+    // Bar Chart — Popular Services
+    new Chart(document.getElementById('popularServicesChart'), {
+        type: 'bar',
+        data: {
+            labels: popularLabels.length ? popularLabels : ['No Data'],
+            datasets: [{
+                label: 'Bookings',
+                data: popularData.length ? popularData : [0],
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    // Pie Chart — Booking Status
+    new Chart(document.getElementById('statusPieChart'), {
+        type: 'pie',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: [
+                    'rgba(255, 193, 7, 0.85)',
+                    'rgba(13, 110, 253, 0.85)',
+                    'rgba(25, 135, 84, 0.85)',
+                ],
+                borderColor: '#fff',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Line Chart — Monthly Revenue
+    new Chart(document.getElementById('revenueLineChart'), {
+        type: 'line',
+        data: {
+            labels: revenueLabels.length ? revenueLabels : ['No Data'],
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: revenueData.length ? revenueData : [0],
+                borderColor: 'rgba(245, 87, 108, 1)',
+                backgroundColor: 'rgba(245, 87, 108, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(245, 87, 108, 1)',
+                pointRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Services — SMART URS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-search me-2"></i>Search & Filter Services</h2>
+
+    <div class="card shadow-sm border-0 mb-4" style="border-radius:14px;">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="q" class="form-control" value="{{ q }}" placeholder="Service name, description...">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Service Type</label>
+                    <select name="service_type" class="form-select">
+                        <option value="">All Types</option>
+                        {% for val, label in service_types %}
+                        <option value="{{ val }}" {% if filters.service_type == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" class="form-control" value="{{ filters.location }}" placeholder="Provider location">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Min Price (₹)</label>
+                    <input type="number" name="min_price" class="form-control" value="{{ filters.min_price }}" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Max Price (₹)</label>
+                    <input type="number" name="max_price" class="form-control" value="{{ filters.max_price }}" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Min Rating</label>
+                    <select name="min_rating" class="form-select">
+                        <option value="">Any</option>
+                        <option value="4" {% if filters.min_rating == '4' %}selected{% endif %}>4+ Stars</option>
+                        <option value="3" {% if filters.min_rating == '3' %}selected{% endif %}>3+ Stars</option>
+                        <option value="2" {% if filters.min_rating == '2' %}selected{% endif %}>2+ Stars</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sort By</label>
+                    <select name="sort" class="form-select">
+                        <option value="">Default</option>
+                        <option value="rating" {% if filters.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                        <option value="price_low" {% if filters.sort == 'price_low' %}selected{% endif %}>Lowest Price</option>
+                        <option value="price_high" {% if filters.sort == 'price_high' %}selected{% endif %}>Highest Price</option>
+                        <option value="popular" {% if filters.sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-1"></i>Apply Filters</button>
+                    <a href="{% url 'search_services' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <div style="height:180px;overflow:hidden;border-radius:12px 12px 0 0;">
+                        {% include 'partials/service_image.html' with service=service css_class='w-100 h-100' %}
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% include 'partials/favorite_button.html' with service=service %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text text-muted small">{{ service.description|truncatewords:15 }}</p>
+                    <p class="mb-1"><strong>₹{{ service.base_price }}</strong></p>
+                    {% if service.avg_rating %}
+                    <p class="small mb-2"><i class="fas fa-star text-warning"></i> {{ service.avg_rating|floatformat:1 }} · {{ service.booking_count }} bookings</p>
+                    {% endif %}
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">View Service</a>
+                    <a href="{% url 'book_provider' service.id %}" class="btn btn-outline-primary btn-sm">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12"><div class="alert alert-info">No services match your search.</div></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load core_extras %}
+
+
+{% block title %}Home Services{% endblock %}
+
+
+{% block content %}
+<!-- All styles consolidated at the top -->
+<style>
+.service-card-image-wrap {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    background: #f0f2f8;
+    box-shadow: 0 2px 10px rgba(5, 2, 38, 0.08);
+}
+
+.service-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 16px;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover .service-card-image {
+    transform: scale(1.08);
+}
+
+.service-card-icon img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: block;
+    margin: 0 auto;
+    border: 2px solid rgb(251, 239, 239);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.card {
+    transition: transform 0.2s;
+    border: none;
+    border-radius: 10px;
+}
+
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+
+.service-details {
+    font-size: 0.9rem;
+}
+
+
+.btn {
+    border-radius: 5px;
+    padding: 8px 20px;
+    font-weight: 500;
+}
+
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff !important;
+}
+
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+
+.list-unstyled li {
+    margin-bottom: 5px;
+}
+
+
+.fa-check {
+    font-size: 0.8rem;
+}
+
+
+.service-category {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+
+.service-category h2 {
+    color: #333;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #cde2f8;
+    padding-bottom: 10px;
+}
+
+
+.service-category .card {
+    border: 1px solid #e9ecef;
+}
+
+
+.service-category .card:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+
+.service-category .btn-primary {
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+.service-category .service-details {
+    min-height: 150px;
+}
+
+
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    flex-wrap: nowrap;
+}
+
+
+.service-card {
+    min-width: 240px;
+    max-width: 330px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 400px; /* Fixed height for all cards */
+}
+
+.service-details:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.service-details h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.service-details .btn-primary {
+    background: linear-gradient(45deg, #4e65ff, #92effd);
+    border: none;
+    color: #fff;
+    transition: 0.3s ease;
+    margin-top: 1rem;
+}
+
+.service-details .btn-primary:hover {
+    background: linear-gradient(45deg, #3d52ff, #7de8fd);
+    transform: translateY(-2px);
+}
+
+
+.service-card:hover .service-card-icon img {
+    transform: scale(1.15);
+}
+
+.service-icon {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    padding-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Custom Book Now Button */
+.custom-book-now-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1e2b6e;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    width: 100%;
+}
+
+.custom-book-now-btn:hover {
+    background-color: #2a3a8c;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.custom-book-now-btn .btn-text {
+    flex-grow: 1;
+    text-align: center;
+    color: white;
+}
+
+
+
+
+.service-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+}
+.service-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+}
+
+/* Circular Service Images */
+.service-card-image-wrap {
+    width: 190px;
+    height: 210px;
+    margin: 10px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.service-card-image-wrap:hover {
+    transform: scale(1.08);
+}
+
+.service-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+</style>
+
+
+
+
+
+
+<!-- Hero Section (Full Image, No Overlay/Text) -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700;900&display=swap" rel="stylesheet">
+<div class="container-fluid py-5" style="background: #f8f9fa; min-height: 100vh; position: relative;">
+  <!-- Dots Pattern positioned to overlap -->
+  <div style="position: absolute; top: 20%; left: 75px; width: 170px; height: 180px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; opacity: 0.3; z-index: 3;">
+    {% for i in '12345678'|make_list %}
+      {% for j in '12345678'|make_list %}
+        <div style="width: 6px; height: 6px; background-color: #042647; border-radius: 50%;"></div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <!-- Overlay with semi-transparent white box -->
+  <div style="position: absolute; left: 0; top: 30%; height: 40%; width: 40%; background: rgba(255,255,255,0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 4px 24px rgba(0,0,0,0.07); z-index: 2; padding: 40px;">
+    <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+      <div style="margin-bottom: 1.5rem;">
+        <div style="text-align: left; padding-left: 20px;">
+          <div style="display: flex; align-items: baseline; margin-bottom: 5px;">
+            <span style="font-family: 'Times New Roman', sans-serif; font-size: 18px; color: #042647; font-weight: 300; margin-right: 8px;">the</span>
+            <span style="font-family: 'Poppins', sans-serif; font-size: 42px; color: #042647; line-height: 1; font-weight: 700; text-transform: lowercase;">best</span>
+          </div>
+          <div>
+            <h1 style="font-family: 'Poppins', sans-serif; font-size: 64px; color: #042647; line-height: 1; margin: 0; font-weight: 900;">Solutions.</h1>
+          </div>
+        </div>
+      </div>
+      <p style="font-family: 'Poppins', sans-serif; font-size: 1.1rem; color: #666; margin-bottom: 2rem; line-height: 1.6; font-style: italic;">"Great service is like a good magic trick—when its done right, you barely notice the effort, but you always leave with a smile!"</p>
+    </div>
+  </div>
+  <div class="row justify-content-center align-items-center" style="min-height: 80vh; margin-left: 300px; position: relative; z-index: 1;">
+    <div class="col-lg-12 p-0 position-relative" style="overflow: visible;">
+      <div style="position: relative;">
+        <img src="{% static 'images/homepage_front.jpg' %}" alt="Hero" class="img-fluid w-100" style="object-fit: cover; min-height: 540px; max-height: 700px; box-shadow: 0 8px 32px rgba(0,0,0,0.10);">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.2);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+.hero-img-wrap {
+    min-height: 540px;
+    max-height: 700px;
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+}
+.hero-overlay-half {
+    background: #fff;
+    height: 100%;
+    min-width: 340px;
+    z-index: 2;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+.hero-img-half img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+    display: block;
+}
+.dots-pattern {
+    pointer-events: none;
+}
+@media (max-width: 900px) {
+  .hero-img-wrap { flex-direction: column; min-height: 400px; }
+  .hero-overlay-half, .hero-img-half { width: 100% !important; min-width: 0; }
+  .hero-overlay-half { min-height: 220px; }
+}
+</style>
+
+
+<!-- Custom Fonts and Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+<style>
+body {
+    background: #f8f9fa !important;
+    font-family: 'Inter', Arial, sans-serif;
+}
+.hero-img-wrap {
+    position: relative;
+    width: 100%;
+    background: #fff;
+}
+.frosted-glass {
+    background: linear-gradient(90deg, rgba(255,255,255,0.92) 80%, rgba(255,255,255,0.2) 100%);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    backdrop-filter: blur(8px);
+    border-radius: 18px;
+}
+.navbar-nav .nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #222 !important;
+    letter-spacing: 0.5px;
+}
+.navbar-nav .nav-link.active {
+    color: #007bff !important;
+}
+</style>
+
+
+
+
+<!-- Services Section -->
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">OUR SERVICES</h1>
+        <a href="{% url 'search_services' %}" class="btn btn-primary"><i class="fas fa-search me-1"></i>Search & Filter</a>
+    </div>
+    {% for service_type, type_name in service_types.items %}
+    <div class="mb-5">
+        <h2 class="mb-4" style="text-transform: uppercase; font-family: 'Times New Roman', Times, serif;">{{ type_name }}</h2>
+        <div class="horizontal-scroll">
+            {% for service in services_by_type|get_item:service_type %}
+            <div class="service-card">
+                <div class="service-card-image-wrap position-relative">
+                    {% include 'partials/service_image.html' with service=service css_class='service-card-image' %}
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% include 'partials/favorite_button.html' with service=service %}
+                    </div>
+                </div>
+                <div class="service-card-body" style="display: flex; flex-direction: column; height: 220px; position: relative;">
+                    <div>
+                        <h5 class="service-card-title" style="font-family: 'Bahnschrift SemiLight Condensed', 'Bahnschrift', Arial, sans-serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; font-size: 1rem; text-align: center; text-transform: uppercase; margin-bottom: 1.2rem;">{{ service.name }}</h5>
+                        <p class="service-card-text" style="font-family: 'Bradley Hand ITC', cursive; font-size: 0.95rem; font-weight: 500; text-align: center; max-height: 120px; overflow: hidden;">{{ service.description }}</p>
+                    </div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        <a href="{% url 'service_detail' service.id %}" class="custom-book-now-btn">
+                            <span class="btn-text">BOOK NOW</span>
+                            <span class="btn-icon">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<br><br><br><br><br>
+
+
+
+
+
+<h2 class="mt-5 mb-4">Recommended For You</h2>
+
+<div class="row">
+    {% for service in recommendations %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+
+        <div class="service-card">
+                <div class="service-card-image-wrap">
+                    {% include 'partials/service_image.html' with service=service css_class='service-card-image' %}
+                </div>
+                <div class="service-card-body" style="display: flex; flex-direction: column; height: 220px; position: relative;">
+                    <div>
+                        <h5 class="service-card-title" style="font-family: 'Bahnschrift SemiLight Condensed', 'Bahnschrift', Arial, sans-serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; font-size: 1rem; text-align: center; text-transform: uppercase; margin-bottom: 1.2rem;">{{ service.name }}</h5>
+                        <p class="service-card-text" style="font-family: 'Bradley Hand ITC', cursive; font-size: 0.95rem; font-weight: 500; text-align: center; max-height: 120px; overflow: hidden;">{{ service.description }}</p>
+                    </div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0;">
+                        <a href="{% url 'service_detail' service.id %}" class="custom-book-now-btn">
+                            <span class="btn-text">VIEW SERVICE</span>
+                            <span class="btn-icon">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<br><br><br><br><br>
+
+<!-- Search Results Section -->
+{% if providers %}
+<section class="container mb-5">
+    <h3 class="mb-4">Available Service Providers</h3>
+    <div class="row g-4">
+        {% for p in providers %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ p.name }}</h5>
+                    <p class="card-text">
+                        <i class="fas fa-tag me-2"></i>{{ p.get_service_type_display }}<br>
+                        <i class="fas fa-map-marker-alt me-2"></i>{{ p.location }}<br>
+                        <i class="fas fa-star me-2"></i>{{ p.rating }}/5.0
+                    </p>
+                    {% if p.experience_years %}
+                    <p class="card-text">
+                        <i class="fas fa-briefcase me-2"></i>{{ p.experience_years }} years experience
+                    </p>
+                    {% endif %}
+                    {% if p.hourly_rate %}
+                    <p class="card-text">
+                        <i class="fas fa-dollar-sign me-2"></i>{{ p.hourly_rate }}/hour
+                    </p>
+                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'book_provider' p.id %}" class="custom-book-now-btn flex-grow-1">
+                            <span class="btn-text">BOOK NOW</span>
+                            <span class="btn-icon">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                        <a href="{% url 'provider_reviews' p.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-comments"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% elif providers is not none %}
+<div class="container">
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>No matching providers found.
+    </div>
+</div>
+{% endif %}
+
+
+<!-- Veg Flatbreads -->
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for item in flatbreads %}
+    <div class="col">
+        <div class="card food-card h-100">
+            <img src="{% static 'food/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+            <div class="card-body d-flex flex-column justify-content-end">
+                <h5 class="card-title food-title">{{ item.name }}</h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<!-- Non-Veg Flatbreads -->
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for item in nv_flatbreads %}
+    <div class="col">
+        <div class="card food-card h-100">
+            <img src="{% static 'food/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+            <div class="card-body d-flex flex-column justify-content-end">
+                <h5 class="card-title food-title">{{ item.name }}</h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+
+

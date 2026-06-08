@@ -1,0 +1,59 @@
+<div class="urs-card p-4 mt-2">
+    <h5 class="fw-bold mb-4" style="color:var(--urs-text);"><i class="fas fa-route me-2" style="color:var(--urs-accent);"></i>Booking Timeline</h5>
+    <div class="timeline">
+        {% with steps=booking %}
+        <div class="d-flex gap-3 mb-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;background:var(--urs-accent);color:#fff;"><i class="fas fa-check small"></i></div>
+            <div>
+                <div class="fw-semibold" style="color:var(--urs-text);">Booking Created</div>
+                <small class="text-muted">{% if steps.created_at %}{{ steps.created_at|date:"M d, Y H:i" }}{% else %}—{% endif %}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-3 mb-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;{% if steps.provider %}background:var(--urs-accent);color:#fff;{% else %}background:var(--urs-border);color:var(--urs-text-muted);{% endif %}">
+                {% if steps.provider %}<i class="fas fa-check small"></i>{% else %}<i class="fas fa-minus small"></i>{% endif %}
+            </div>
+            <div>
+                <div class="fw-semibold" style="color:var(--urs-text);">Provider Assigned</div>
+                <small class="text-muted">{{ steps.provider.name|default:"Pending" }}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-3 mb-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;{% if steps.accepted_at %}background:var(--urs-accent);color:#fff;{% else %}background:var(--urs-border);{% endif %}">
+                {% if steps.accepted_at %}<i class="fas fa-check small"></i>{% else %}<i class="fas fa-minus small"></i>{% endif %}
+            </div>
+            <div>
+                <div class="fw-semibold">Accepted</div>
+                <small class="text-muted">{% if steps.accepted_at %}{{ steps.accepted_at|date:"M d, Y H:i" }}{% else %}Pending{% endif %}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-3 mb-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;{% if steps.started_at %}background:var(--urs-accent);color:#fff;{% else %}background:var(--urs-border);{% endif %}">
+                {% if steps.started_at %}<i class="fas fa-check small"></i>{% else %}<i class="fas fa-minus small"></i>{% endif %}
+            </div>
+            <div>
+                <div class="fw-semibold">In Progress</div>
+                <small class="text-muted">{% if steps.started_at %}{{ steps.started_at|date:"M d, Y H:i" }}{% else %}Pending{% endif %}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-3 mb-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;{% if steps.payments.all.0.status == 'completed' %}background:var(--urs-accent);color:#fff;{% else %}background:var(--urs-border);{% endif %}">
+                <i class="fas fa-{% if steps.payments.all.0.status == 'completed' %}check{% else %}minus{% endif %} small"></i>
+            </div>
+            <div>
+                <div class="fw-semibold">Payment Completed</div>
+                <small class="text-muted">{% with p=steps.payments.all.0 %}{% if p and p.status == 'completed' %}{{ p.paid_at|date:"M d, Y H:i"|default:p.created_at|date:"M d, Y H:i" }}{% else %}Pending{% endif %}{% endwith %}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-3 align-items-start">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;{% if steps.status == 'Completed' %}background:var(--urs-accent);color:#fff;{% else %}background:var(--urs-border);{% endif %}">
+                {% if steps.status == 'Completed' %}<i class="fas fa-check small"></i>{% else %}<i class="fas fa-minus small"></i>{% endif %}
+            </div>
+            <div>
+                <div class="fw-semibold">Service Completed</div>
+                <small class="text-muted">{% if steps.completed_at %}{{ steps.completed_at|date:"M d, Y H:i" }}{% else %}Pending{% endif %}</small>
+            </div>
+        </div>
+        {% endwith %}
+    </div>
+</div>

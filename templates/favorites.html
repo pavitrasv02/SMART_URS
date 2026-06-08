@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Services — SMART URS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-heart text-danger me-2"></i>Saved Services</h2>
+    {% if favorites %}
+    <div class="row g-4">
+        {% for fav in favorites %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div style="height:160px;overflow:hidden;">
+                    {% include 'partials/service_image.html' with service=fav.service %}
+                </div>
+                <div class="card-body">
+                    <h5>{{ fav.service.name }}</h5>
+                    <p class="text-muted small">{{ fav.service.description|truncatewords:12 }}</p>
+                    <p><strong>₹{{ fav.service.base_price }}</strong></p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'book_provider' fav.service.id %}" class="btn btn-primary btn-sm">Book Now</a>
+                        <a href="{% url 'service_detail' fav.service.id %}" class="btn btn-outline-secondary btn-sm">Details</a>
+                        <form method="POST" action="{% url 'toggle_favorite' fav.service.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'favorites_list' %}">
+                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-heart-broken"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>No saved services yet. Browse services and tap ❤️ to save them.
+        <a href="{% url 'search_services' %}" class="alert-link">Search services</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

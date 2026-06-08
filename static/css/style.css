@@ -1,0 +1,151 @@
+/* POPPINS FONT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: url('../images/homepage_front12.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.form-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 512px;
+    height: 800px;
+    margin: 0 auto;
+    padding-top: 60px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.login-container {
+    position: absolute;
+    width: 100%;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    transition: .5s ease-in-out;
+}
+
+.input-box {
+    position: relative;
+    width: 100%;
+    height: 45px;
+    margin: 15px 0;
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    padding: 0 45px;
+    color: #333;
+    font-size: 16px;
+    backdrop-filter: blur(5px);
+}
+
+.input-box input::placeholder {
+    color: rgba(51, 51, 51, 0.8);
+}
+
+.submit {
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    background: linear-gradient(45deg, #4e65ff, #92effd);
+    cursor: pointer;
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    width: 100%;
+    transition: 0.3s ease;
+}
+
+.submit:hover {
+    background: linear-gradient(45deg, #3d52ff, #7de8fd);
+    transform: translateY(-2px);
+}
+
+header {
+    color: #333;
+    font-size: 28px;
+    text-align: center;
+    padding: 10px 0 30px 0;
+    font-weight: 600;
+}
+.two-col {
+    display: flex;
+    justify-content: space-between;
+    color: black;
+    font-size: small;
+    margin-top: 10px;
+}
+
+.two-col .one {
+    display: flex;
+    gap: 5px;
+    color: black;
+}
+
+.two label a {
+    text-decoration: none;
+    color: black;
+}
+
+.two label a:hover {
+    text-decoration: underline;
+}
+
+@media only screen and (max-width: 786px) {
+    .nav-button {
+        display: none;
+    }
+    .nav-menu.responsive {
+        top: 60px;
+    }
+    .nav-menu {
+        position: absolute;
+        top: -800px;
+        display: flex;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        width: 100%;
+        height: max-content;
+        backdrop-filter: blur(20px);
+        transition: .3s;
+    }
+    .nav-menu ul {
+        flex-direction: column;
+        text-align: center;
+    }
+    .nav-menu-btn {
+        display: block;
+    }
+    .nav-menu-btn i {
+        font-size: 25px;
+        color: #fff;
+        padding: 10px;
+        cursor: pointer;
+    }
+}

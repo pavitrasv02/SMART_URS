@@ -1,0 +1,6 @@
+{% load static %}
+{% if service.image_name %}
+<img src="{% static 'images/services/' %}{{ service.image_name }}" alt="{{ alt|default:service.name }}"{% if css_class %} class="{{ css_class }}"{% endif %}>
+{% else %}
+<img src="{% static 'images/services/default.jpg' %}" alt="{{ alt|default:service.name }}"{% if css_class %} class="{{ css_class }}"{% endif %}>
+{% endif %}

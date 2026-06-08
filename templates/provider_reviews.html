@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ provider.name }} Reviews{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Reviews for {{ provider.name }}</h2>
+
+    {% if reviews %}
+        <div class="list-group">
+            {% for review in reviews %}
+                <div class="list-group-item mb-3 shadow-sm border rounded">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mb-1">Rating: ⭐ {{ review.rating }}/5</h5>
+                        <small class="text-muted">
+                            By {{ review.booking.user.name }} ({{ review.booking.booking_date }})
+                        </small>
+                    </div>
+                    <p class="mb-1 mt-2">{{ review.comment }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No reviews yet for this provider.</p>
+    {% endif %}
+
+    <a href="{% url 'home' %}" class="btn btn-outline-primary mt-4">← Back to Home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Add New Dish</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="dish_type" class="form-label">Dish Type</label>
+                            <select class="form-select" id="dish_type" name="dish_type" required onchange="toggleVegOptions()">
+                                <option value="">Select Type</option>
+                                <option value="veg">Vegetarian</option>
+                                <option value="non_veg">Non-Vegetarian</option>
+                            </select>
+                        </div>
+
+                        <div id="veg_options" class="mb-3" style="display: none;">
+                            <label for="veg_dish_type" class="form-label">Vegetarian Dish Type</label>
+                            <select class="form-select" id="veg_dish_type" name="veg_dish_type">
+                                <option value="chapati_curry">Chapati + Curry</option>
+                                <option value="paratha">Paratha</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Dish Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price (₹)</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Add Dish</button>
+                            <a href="{% url 'cooking_services' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleVegOptions() {
+    const dishType = document.getElementById('dish_type').value;
+    const vegOptions = document.getElementById('veg_options');
+    const vegDishType = document.getElementById('veg_dish_type');
+    
+    if (dishType === 'veg') {
+        vegOptions.style.display = 'block';
+        vegDishType.required = true;
+    } else {
+        vegOptions.style.display = 'none';
+        vegDishType.required = false;
+    }
+}
+
+// Auto-show veg options if form was submitted with 'veg' selected
+document.addEventListener('DOMContentLoaded', function() {
+    toggleVegOptions();
+});
+</script>
+{% endblock %}

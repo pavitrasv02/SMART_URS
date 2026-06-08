@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Provider Profile — SMART URS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-edit me-2"></i>My Profile</h2>
+        <a href="{% url 'provider_dashboard' %}" class="btn btn-outline-primary">← Dashboard</a>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <div class="card shadow-sm border-0" style="border-radius:16px;">
+        <div class="card-body p-4">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ provider.name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ provider.phone }}" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3">{{ provider.description }}</textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Experience (years)</label>
+                        <input type="number" name="experience_years" class="form-control" value="{{ provider.experience_years }}" min="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Languages</label>
+                        <input type="text" name="languages" class="form-control" value="{{ provider.languages }}" placeholder="English, Hindi">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Working Hours</label>
+                        <input type="text" name="working_hours" class="form-control" value="{{ provider.working_hours }}" placeholder="9 AM - 6 PM">
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="availability" id="availability" {% if provider.availability %}checked{% endif %}>
+                            <label class="form-check-label" for="availability">Available for new bookings</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-4 px-4">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4" style="border-radius:16px;">
+        <div class="card-body p-4">
+            <h4 class="mb-3"><i class="fas fa-clock me-2"></i>Time Slot Availability</h4>
+            <p class="text-muted small">Set when you are available or unavailable. Occupied slots are filled automatically when customers book.</p>
+            <form method="POST" class="row g-3 mb-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_slot">
+                <div class="col-md-4">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="slot_date" class="form-control" required min="{{ today|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Time</label>
+                    <select name="slot_time" class="form-select" required>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="slot_status" class="form-select">
+                        <option value="available">Available</option>
+                        <option value="unavailable">Unavailable</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-outline-primary">Add / Update Slot</button>
+                </div>
+            </form>
+            {% if time_slots %}
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in time_slots %}
+                        <tr>
+                            <td>{{ slot.date|date:"M d, Y" }}</td>
+                            <td>{{ slot.time|time:"g:i A" }}</td>
+                            <td>
+                                {% if slot.status == 'available' %}
+                                <span class="badge bg-success">Available</span>
+                                {% elif slot.status == 'occupied' %}
+                                <span class="badge bg-warning text-dark">Occupied</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Unavailable</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No custom slots yet. Default hours (9 AM – 5 PM) apply until you mark times unavailable.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

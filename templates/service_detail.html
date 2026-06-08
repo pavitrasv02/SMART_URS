@@ -1,0 +1,587 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load core_extras %}
+
+{% block title %}{{ service.name }} — SMART URS{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --urs-dark: #050226;
+        --urs-accent: #3498db;
+        --urs-bg: #e7e6f1;
+        --urs-card-shadow: 0 4px 20px rgba(5, 2, 38, 0.08);
+    }
+
+    .service-detail-page {
+        background: var(--urs-bg);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    .service-detail-page .breadcrumb {
+        background: transparent;
+        padding-left: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-detail-page .breadcrumb-item a {
+        color: var(--urs-accent);
+        text-decoration: none;
+    }
+
+    .service-detail-page .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    /* 70 / 30 desktop layout */
+    .service-detail-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.75rem;
+        align-items: flex-start;
+    }
+
+    .service-detail-main {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .service-detail-sidebar {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .service-detail-main {
+            flex: 0 0 calc(70% - 0.875rem);
+            max-width: calc(70% - 0.875rem);
+        }
+
+        .service-detail-sidebar {
+            flex: 0 0 calc(30% - 0.875rem);
+            max-width: calc(30% - 0.875rem);
+        }
+    }
+
+    /* Main content */
+    .service-hero-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: var(--urs-card-shadow);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-hero-image {
+        width: 100%;
+        max-width: 350px;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        display: block;
+        margin: 20px auto;
+}
+
+    .service-hero-body {
+        padding: 2rem;
+    }
+
+    .service-type-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--urs-dark), #2d1b69);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.35rem 0.85rem;
+        border-radius: 50px;
+        margin-bottom: 0.75rem;
+    }
+
+    .service-hero-title {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: var(--urs-dark);
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .service-hero-lead {
+        color: #555;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+    }
+
+    .service-price-tag {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.35rem;
+        background: #f0f4ff;
+        border-radius: 10px;
+        padding: 0.6rem 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-price-tag .label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .service-price-tag .amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--urs-dark);
+    }
+
+    .detail-section-card {
+        background: #fff;
+        border: none;
+        border-radius: 16px;
+        box-shadow: var(--urs-card-shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-section-card .card-body {
+        padding: 1.75rem;
+    }
+
+    .detail-section-card h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--urs-dark);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #eef0f4;
+    }
+
+    .detail-section-card p {
+        margin-bottom: 0.5rem;
+        color: #444;
+    }
+
+    .detail-section-card ul {
+        padding-left: 1.25rem;
+        color: #444;
+    }
+
+    .btn-book-service {
+        background: var(--urs-accent);
+        border-color: var(--urs-accent);
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-book-service:hover {
+        background: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+    }
+
+    /* Recommendations sidebar */
+    .recommendations-sidebar {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: var(--urs-card-shadow);
+        padding: 1.5rem;
+    }
+
+    @media (min-width: 992px) {
+        .recommendations-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+    }
+
+    .recommendations-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--urs-dark);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #eef0f4;
+    }
+
+    .rec-card {
+        border: 1px solid #eef0f4;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        background: #fff;
+        transition: transform 0.28s ease, box-shadow 0.28s ease;
+        cursor: pointer;
+    }
+
+    .rec-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .rec-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 12px 28px rgba(5, 2, 38, 0.15);
+    }
+
+    .rec-card-image-wrap {
+        overflow: hidden;
+        height: 130px;
+        background: #f8f9fc;
+    }
+
+    .rec-card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+    }
+
+    .rec-card:hover .rec-card-image {
+        transform: scale(1.06);
+    }
+
+    .rec-card-body {
+        padding: 0.9rem 1rem 1rem;
+    }
+
+    .rec-card-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--urs-dark);
+        margin-bottom: 0.35rem;
+        line-height: 1.3;
+        display: -webkit-box;
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .rec-card-price {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--urs-accent);
+        margin-bottom: 0.4rem;
+    }
+
+    .rec-card-price span {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #6c757d;
+    }
+
+    .rec-card-desc {
+        font-size: 0.8rem;
+        color: #6c757d;
+        line-height: 1.45;
+        margin-bottom: 0.75rem;
+        display: -webkit-box;
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .btn-view-service {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: transparent;
+        border: 1.5px solid var(--urs-accent);
+        color: var(--urs-accent);
+        border-radius: 8px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-view-service:hover {
+        background: var(--urs-accent);
+        color: #fff;
+    }
+
+    .rec-empty-state {
+        text-align: center;
+        padding: 1.5rem 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .rec-empty-state i {
+        font-size: 2rem;
+        color: var(--urs-accent);
+        margin-bottom: 0.75rem;
+        display: block;
+        opacity: 0.6;
+    }
+
+    .rec-empty-state a {
+        color: var(--urs-accent);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .rec-empty-state a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="service-detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services' %}">Services</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ service.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="service-detail-layout">
+
+            <!-- Main Content — 70% -->
+            <div class="service-detail-main">
+
+                <!-- Hero -->
+                <div class="service-hero-card">
+                    <div class="service-hero-image-wrap">
+                        {% include 'partials/service_image.html' with service=service css_class='service-hero-image' %}
+                    </div>
+                    <div class="service-hero-body">
+                        <span class="service-type-badge">
+                            <i class="fas fa-tag me-1"></i>{{ service.get_service_type_display }}
+                        </span>
+                        <h1 class="service-hero-title">{{ service.name }}</h1>
+                        <p class="service-hero-lead">{{ service.description }}</p>
+                        <div class="service-price-tag">
+                            <span class="label">Starting from</span>
+                            <span class="amount">₹{{ service.base_price }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Details -->
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-info-circle me-2 text-primary"></i>Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Service Type:</strong> {{ service.get_service_type_display }}</p>
+                                <p><strong>Base Price:</strong> ₹{{ service.base_price }}</p>
+                                {% if service.duration_hours %}
+                                <p><strong>Duration:</strong> {{ service.duration_hours }} hours</p>
+                                {% endif %}
+                                {% if service.price_per_hour %}
+                                <p><strong>Price per Hour:</strong> ₹{{ service.price_per_hour }}</p>
+                                {% endif %}
+                            </div>
+                            {% if service.includes %}
+                            <div class="col-md-6">
+                                <p><strong>What's Included:</strong></p>
+                                <p>{{ service.includes }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if service.service_type == 'cleaning' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-broom me-2 text-primary"></i>Cleaning Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.area_coverage %}
+                                <p><strong>Area Coverage:</strong> {{ service.area_coverage }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif service.service_type == 'maintenance' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-tools me-2 text-primary"></i>Maintenance Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.maintenance_option %}
+                                <p><strong>Maintenance Option:</strong> {{ service.get_maintenance_option_display }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif service.service_type == 'gardening' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-leaf me-2 text-primary"></i>Gardening Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.gardening_option %}
+                                <p><strong>Gardening Option:</strong> {{ service.get_gardening_option_display }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif service.service_type == 'automation' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-home me-2 text-primary"></i>Home Automation Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.automation_option %}
+                                <p><strong>Automation Option:</strong> {{ service.get_automation_option_display }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif service.service_type == 'cooking' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-utensils me-2 text-primary"></i>Cooking Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.cooking_option %}
+                                <p><strong>Cooking Option:</strong> {{ service.get_cooking_option_display }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif service.service_type == 'security' %}
+                <div class="detail-section-card card">
+                    <div class="card-body">
+                        <h2><i class="fas fa-shield-alt me-2 text-primary"></i>Security Service Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if service.security_option %}
+                                <p><strong>Security Option:</strong> {{ service.get_security_option_display }}</p>
+                                {% endif %}
+                                {% if service.details %}
+                                <h4 class="h6 mt-3">Service Descriptions</h4>
+                                <ul>
+                                    {% for line in service.details.splitlines %}
+                                        {% if line.strip %}
+                                        <li>{{ line|before_colon|safe }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a href="{% url 'book_provider' service.id %}" class="btn btn-primary btn-book-service btn-lg">
+                        <i class="fas fa-calendar-check me-2"></i>Book This Service
+                    </a>
+                    {% include 'partials/favorite_button.html' with service=service %}
+                </div>
+            </div>
+
+            <!-- Recommendations Sidebar — 30% -->
+            <div class="service-detail-sidebar">
+                <aside class="recommendations-sidebar">
+                    <h3 class="recommendations-title"> Recommended For You</h3>
+
+                    {% if recommended_services %}
+                        {% for rec in recommended_services %}
+                        <div class="rec-card" onclick="window.location='{% url 'service_detail' rec.id %}'">
+                            <div class="rec-card-image-wrap">
+                                {% include 'partials/service_image.html' with service=rec css_class='rec-card-image' %}
+                            </div>
+                            <div class="rec-card-body">
+                                <div class="rec-card-name">{{ rec.name }}</div>
+                                <div class="rec-card-price">
+                                    <span>From</span> ₹{{ rec.base_price }}
+                                </div>
+                                <p class="rec-card-desc">{{ rec.description|truncatewords:14 }}</p>
+                                <a href="{% url 'service_detail' rec.id %}"
+                                   class="btn-view-service"
+                                   onclick="event.stopPropagation()">
+                                    View Service
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="rec-empty-state">
+                            <i class="fas fa-compass"></i>
+                            <p>Explore our other popular services.</p>
+                            <a href="{% url 'services' %}">Browse All Services <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    {% endif %}
+                </aside>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Provider Login — SMART URS{% endblock %}
+
+{% block content %}
+<style>
+    .provider-login-card {
+        max-width: 440px;
+        margin: 4rem auto;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(5, 2, 38, 0.12);
+    }
+    .provider-login-header {
+        background: linear-gradient(135deg, #050226, #2d1b69);
+        color: #fff;
+        border-radius: 16px 16px 0 0;
+        padding: 2rem;
+        text-align: center;
+    }
+</style>
+<div class="container">
+    <div class="card provider-login-card">
+        <div class="provider-login-header">
+            <i class="fas fa-user-tie fa-2x mb-2"></i>
+            <h3 class="mb-0">Provider Portal</h3>
+            <p class="mb-0 mt-1 opacity-75">SMART URS Partner Login</p>
+        </div>
+        <div class="card-body p-4">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required placeholder="provider@email.com">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Dashboard
+                </button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{% url 'home' %}" class="text-muted small">← Back to Customer Site</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment History — SMART URS{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/payment.css' %}">
+
+<div class="payment-page">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="fw-bold" style="color:var(--urs-text);"><i class="fas fa-receipt me-2"></i>Payment History</h2>
+            <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary">← My Bookings</a>
+        </div>
+
+        <div class="urs-card p-3 mb-4">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search transaction or service…" value="{{ q }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="sort" class="form-select">
+                        <option value="latest" {% if sort == 'latest' %}selected{% endif %}>Latest First</option>
+                        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="urs-btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        {% for payment in payments %}
+        <div class="urs-card p-4 mb-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h6 class="fw-bold mb-1">{{ payment.service_name }}</h6>
+                    <p class="text-muted small mb-1">Booking #{{ payment.booking.id }} · {{ payment.booking.provider.name|default:"—" }}</p>
+                    <p class="small mb-0">
+                        <span class="badge {% if payment.status == 'completed' %}bg-success{% elif payment.status == 'failed' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ payment.get_status_display }}</span>
+                        · {{ payment.get_mode_display }} · {{ payment.created_at|date:"M d, Y H:i" }}
+                    </p>
+                    {% if payment.transaction_id %}<p class="small text-muted mb-0 mt-1">TXN: {{ payment.transaction_id }}</p>{% endif %}
+                </div>
+                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                    <div class="fs-4 fw-bold" style="color:var(--urs-accent);">₹{{ payment.amount }}</div>
+                    {% if payment.booking.invoice %}
+                    <a href="{% url 'download_invoice' payment.booking.invoice.id %}" class="btn btn-sm btn-outline-primary mt-2"><i class="fas fa-download me-1"></i>Invoice</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">No payments found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

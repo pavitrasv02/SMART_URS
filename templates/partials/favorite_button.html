@@ -1,0 +1,9 @@
+{% if request.session.user_id %}
+<form method="POST" action="{% url 'toggle_favorite' service.id %}" class="d-inline favorite-form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <button type="submit" class="btn btn-sm {% if service.id in favorite_ids %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-circle favorite-btn" title="{% if service.id in favorite_ids %}Remove from favorites{% else %}Save service{% endif %}">
+        <i class="{% if service.id in favorite_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+    </button>
+</form>
+{% endif %}

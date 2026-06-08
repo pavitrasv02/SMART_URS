@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Book {{ service.name }} — SMART URS{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/book.css' %}">
+
+<div class="book-page">
+    <div class="container">
+        <!-- Hero -->
+        <div class="book-hero">
+            <span class="book-hero-badge"><i class="fas fa-sparkles me-1"></i> Premium Booking</span>
+            <h1>{{ service.name }}</h1>
+            <p class="mb-2 opacity-90">{{ service.description|truncatewords:25 }}</p>
+            <div class="book-hero-price">₹{{ service.base_price }} <small class="fs-6 opacity-75">onwards</small></div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Main column -->
+            <div class="col-lg-8">
+                <!-- Service Details -->
+                <div class="book-section">
+                    <h3 class="book-section-title"><i class="fas fa-info-circle"></i> Service Details</h3>
+                    <div class="book-detail-grid mb-3">
+                        <div class="book-detail-item">
+                            <div class="label">Type</div>
+                            <div class="value">{{ service.get_service_type_display }}</div>
+                        </div>
+                        <div class="book-detail-item">
+                            <div class="label">Base Price</div>
+                            <div class="value">₹{{ service.base_price }}</div>
+                        </div>
+                        {% if service.duration_hours %}
+                        <div class="book-detail-item">
+                            <div class="label">Duration</div>
+                            <div class="value">{{ service.duration_hours }} hrs</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-0" style="color: var(--urs-text-muted) !important;">{{ service.description }}</p>
+                    {% if service.includes %}
+                    <div class="mt-3">
+                        <strong style="color: var(--urs-text);">Includes:</strong>
+                        <ul class="mt-2 mb-0" style="color: var(--urs-text-muted);">
+                            {% for item in service.includes.split %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if service.service_type == 'cooking' %}
+                <div class="book-section text-center">
+                    <a href="{% url 'cooking_services' %}?service_id={{ service.id }}" class="btn urs-btn-primary food-pref-btn">
+                        <i class="fas fa-utensils me-2"></i>Food Preferences
+                    </a>
+                </div>
+                <div class="book-section" id="yourFoodSection">
+                    <h3 class="book-section-title"><i class="fas fa-bowl-food"></i> Your Food</h3>
+                    <div class="list-group list-group-flush">
+                        {% for item in selected_food %}
+                            {% if forloop.counter0|divisibleby:2 %}
+                            <div class="list-group-item d-flex justify-content-between border-0 px-0" style="background: transparent; color: var(--urs-text);">
+                                <span>{{ item }}</span>
+                                <span class="text-muted">₹{{ selected_food|index:forloop.counter }}</span>
+                            </div>
+                            {% endif %}
+                        {% empty %}
+                        <p class="text-muted mb-0">No food selected yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% elif service.name != "Carpet & Upholstery Cleaning" and service.name != "Carpet Cleaning" and service.service_type != 'cleaning' and service.service_type != 'maintenance' and service.service_type != 'gardening' and service.service_type != 'security' and service.service_type != 'automation' %}
+                <div class="book-section">
+                    <h3 class="book-section-title"><i class="fas fa-list"></i> Select Type</h3>
+                    <div class="d-flex gap-2 mb-3">
+                        <button type="button" class="btn btn-outline-success food-pref-btn" id="vegBtn">Veg</button>
+                        <button type="button" class="btn btn-outline-danger food-pref-btn" id="nonVegBtn">Non-Veg</button>
+                    </div>
+                    <div id="vegMenu" style="display:none;">
+                        <h6 class="mb-2" style="color: var(--urs-text);">Veg Menu</h6>
+                        <div class="list-group">
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="10" data-value="Chapati"><span>Chapati</span><span>₹10</span></div>
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="50" data-value="Curry"><span>Curry</span><span>₹50</span></div>
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="30" data-value="Rice"><span>Rice</span><span>₹30</span></div>
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="40" data-value="Dal"><span>Dal</span><span>₹40</span></div>
+                        </div>
+                    </div>
+                    <div id="nonVegMenu" style="display:none;">
+                        <h6 class="mb-2" style="color: var(--urs-text);">Non-Veg Menu</h6>
+                        <div class="list-group">
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="80" data-value="Chicken Curry"><span>Chicken Curry</span><span>₹80</span></div>
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="100" data-value="Fish Fry"><span>Fish Fry</span><span>₹100</span></div>
+                            <div class="list-group-item menu-item d-flex justify-content-between" data-price="60" data-value="Egg Curry"><span>Egg Curry</span><span>₹60</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 fw-bold" style="color: var(--urs-accent);">Total: ₹<span id="totalPrice">0</span></div>
+                </div>
+                {% endif %}
+
+                <!-- Booking Form -->
+                <form method="POST" id="bookingForm" class="book-section" novalidate>
+                    {% csrf_token %}
+
+                    <h3 class="book-section-title"><i class="fas fa-user"></i> Your Details</h3>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating urs-form-floating">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{{ user_obj.name|default:'' }}" required>
+                                <label for="name">Full Name</label>
+                                <div class="invalid-feedback">Please enter your name.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating urs-form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ user_obj.email|default:'' }}" required>
+                                <label for="email">Email</label>
+                                <div class="invalid-feedback">Please enter a valid email.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating urs-form-floating">
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" value="{{ user_obj.phone|default:'' }}" required>
+                                <label for="phone">Phone</label>
+                                <div class="invalid-feedback">Please enter your phone.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating urs-form-floating">
+                                <input type="text" class="form-control" id="address" name="address" placeholder="Address" value="{{ user_obj.address|default:'' }}" required>
+                                <label for="address">Address</label>
+                                <div class="invalid-feedback">Please enter your address.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="book-section-title"><i class="fas fa-calendar-alt"></i> Booking Details</h3>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating urs-form-floating">
+                                <input type="date" class="form-control" id="booking_date" name="booking_date" value="{{ default_date }}" required min="{{ today|date:'Y-m-d' }}">
+                                <label for="booking_date">Preferred Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="color: var(--urs-text);">Available Time Slots</label>
+                            <input type="hidden" id="booking_time" name="booking_time" required>
+                            <div id="slotContainer" class="d-flex flex-wrap gap-2">
+                                {% for slot in available_slots %}
+                                <button type="button" class="slot-chip slot-btn" data-time="{{ slot.time }}">
+                                    {{ slot.label }}
+                                    <span class="providers-count">{{ slot.count }} providers</span>
+                                </button>
+                                {% empty %}
+                                <span class="text-muted small">No slots available for selected date.</span>
+                                {% endfor %}
+                            </div>
+                            <div class="invalid-feedback d-block" id="slotError" style="display:none !important;">Please select a time slot.</div>
+                        </div>
+                    </div>
+
+                    {% if providers %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: var(--urs-text);"><i class="fas fa-user-tie me-1"></i> Preferred Provider <span class="text-muted fw-normal">(optional)</span></label>
+                        <select name="preferred_provider" class="form-select book-provider-select">
+                            <option value="">Auto-assign best available</option>
+                            {% for p in providers %}
+                            <option value="{{ p.id }}">{{ p.name }} — ⭐ {{ p.rating }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">If unavailable, another provider will be assigned automatically.</small>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="book-submit-btn d-lg-none">
+                        <i class="fas fa-calendar-check me-2"></i>Confirm Booking
+                    </button>
+                </form>
+
+                <!-- Reviews -->
+                <div class="book-section">
+                    <h3 class="book-section-title"><i class="fas fa-star"></i> Provider Reviews</h3>
+                    {% if provider_reviews %}
+                        {% for review in provider_reviews %}
+                        <div class="review-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="review-stars">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                        {% endfor %}
+                                        <span class="ms-1" style="color: var(--urs-text);">{{ review.rating }}/5</span>
+                                    </div>
+                                    <div class="review-author mt-1">{{ review.booking.user.name }}</div>
+                                </div>
+                                <div class="review-date">{{ review.booking.booking_date }}</div>
+                            </div>
+                            <p class="mb-0" style="color: var(--urs-text-muted);">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">No reviews yet for providers of this service.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sticky Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="book-summary-card">
+                    <h5 class="fw-bold mb-3" style="color: var(--urs-text);">Booking Summary</h5>
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Service</span>
+                        <span class="fw-semibold text-end" style="color: var(--urs-text);">{{ service.name|truncatewords:4 }}</span>
+                    </div>
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Type</span>
+                        <span style="color: var(--urs-text);">{{ service.get_service_type_display }}</span>
+                    </div>
+                    {% if service.duration_hours %}
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Duration</span>
+                        <span style="color: var(--urs-text);">{{ service.duration_hours }} hours</span>
+                    </div>
+                    {% endif %}
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Date</span>
+                        <span id="summaryDate" style="color: var(--urs-text);">{{ default_date }}</span>
+                    </div>
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Time</span>
+                        <span id="summaryTime" style="color: var(--urs-text);">—</span>
+                    </div>
+                    <div class="book-summary-row">
+                        <span style="color: var(--urs-text-muted);">Total</span>
+                        <span class="book-summary-total">₹{{ service.base_price }}</span>
+                    </div>
+                    <button type="submit" form="bookingForm" class="book-submit-btn d-none d-lg-block">
+                        <i class="fas fa-lock me-2"></i>Confirm Booking
+                    </button>
+                    <p class="text-center text-muted small mt-3 mb-0"><i class="fas fa-shield-alt me-1"></i> Secure booking · No payment required now</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('booking_date');
+    const slotContainer = document.getElementById('slotContainer');
+    const timeInput = document.getElementById('booking_time');
+    const summaryDate = document.getElementById('summaryDate');
+    const summaryTime = document.getElementById('summaryTime');
+    const slotError = document.getElementById('slotError');
+    const bookingForm = document.getElementById('bookingForm');
+    const serviceId = {{ service.id }};
+
+    function selectSlot(btn) {
+        document.querySelectorAll('.slot-chip').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        timeInput.value = btn.dataset.time;
+        summaryTime.textContent = btn.textContent.trim().split('\n')[0] || btn.dataset.time;
+        if (slotError) slotError.style.display = 'none';
+    }
+
+    function bindSlotButtons() {
+        document.querySelectorAll('.slot-btn').forEach(btn => {
+            btn.addEventListener('click', function() { selectSlot(this); });
+        });
+    }
+
+    function loadSlots(date) {
+        fetch(`/api/slots/${serviceId}/?date=${date}`)
+            .then(r => r.json())
+            .then(data => {
+                slotContainer.innerHTML = '';
+                timeInput.value = '';
+                summaryTime.textContent = '—';
+                if (!data.slots.length) {
+                    slotContainer.innerHTML = '<span class="text-muted small">No slots available.</span>';
+                    return;
+                }
+                data.slots.forEach(slot => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'slot-chip slot-btn';
+                    btn.dataset.time = slot.time;
+                    btn.innerHTML = `${slot.label}<span class="providers-count">${slot.count} providers</span>`;
+                    slotContainer.appendChild(btn);
+                });
+                bindSlotButtons();
+            });
+    }
+
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            summaryDate.textContent = this.value;
+            loadSlots(this.value);
+        });
+        bindSlotButtons();
+    }
+
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function(e) {
+            if (!timeInput.value) {
+                e.preventDefault();
+                if (slotError) slotError.style.display = 'block';
+                slotContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (!bookingForm.checkValidity()) {
+                e.preventDefault();
+                bookingForm.classList.add('was-validated');
+            }
+        });
+    }
+
+    const vegBtn = document.getElementById('vegBtn');
+    const nonVegBtn = document.getElementById('nonVegBtn');
+    const vegMenu = document.getElementById('vegMenu');
+    const nonVegMenu = document.getElementById('nonVegMenu');
+    const totalPriceSpan = document.getElementById('totalPrice');
+
+    function updateTotal() {
+        if (!totalPriceSpan) return;
+        let total = 0;
+        document.querySelectorAll('.menu-item.selected').forEach(item => {
+            total += parseInt(item.getAttribute('data-price'));
+        });
+        totalPriceSpan.textContent = total;
+    }
+
+    if (vegBtn && nonVegBtn) {
+        vegBtn.onclick = function() {
+            vegMenu.style.display = 'block';
+            nonVegMenu.style.display = 'none';
+            document.querySelectorAll('#nonVegMenu .menu-item').forEach(i => i.classList.remove('selected'));
+            updateTotal();
+        };
+        nonVegBtn.onclick = function() {
+            vegMenu.style.display = 'none';
+            nonVegMenu.style.display = 'block';
+            document.querySelectorAll('#vegMenu .menu-item').forEach(i => i.classList.remove('selected'));
+            updateTotal();
+        };
+    }
+
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.onclick = function() { this.classList.toggle('selected'); updateTotal(); };
+    });
+});
+</script>
+{% endblock %}

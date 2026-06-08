@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave a Review{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3 class="mb-4">Leave a Review for {{ booking.provider.name }}</h3>
+
+    <form method="POST" class="bg-white p-4 rounded shadow-sm border">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Rating (1 to 5)</label>
+            <select name="rating" class="form-select" required>
+                {% for r in "12345" %}
+                    <option value="{{ r }}">{{ r }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Comment</label>
+            <textarea name="comment" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit Review</button>
+        <a href="{% url 'my_bookings' %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

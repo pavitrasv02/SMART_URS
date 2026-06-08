@@ -1,0 +1,267 @@
+/* Premium booking page — SMART URS */
+
+.book-page {
+    min-height: 100vh;
+    padding: 2rem 0 4rem;
+    background: var(--urs-bg);
+}
+
+.book-hero {
+    background: var(--urs-hero-gradient);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    color: #fff;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--urs-shadow-lg);
+}
+
+.book-hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.book-hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 0.35rem 0.9rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+
+.book-hero h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.book-hero-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #5EEAD4;
+}
+
+.book-section {
+    background: var(--urs-card);
+    border: 1px solid var(--urs-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--urs-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.book-section:hover {
+    box-shadow: var(--urs-shadow-lg);
+}
+
+.book-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--urs-text);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.book-section-title i {
+    color: var(--urs-accent);
+}
+
+.book-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.book-detail-item {
+    background: var(--urs-slot-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.book-detail-item .label {
+    font-size: 0.75rem;
+    color: var(--urs-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.book-detail-item .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--urs-text);
+    margin-top: 0.25rem;
+}
+
+/* Time slot chips */
+.slot-chip {
+    border: 2px solid var(--urs-border);
+    background: var(--urs-slot-bg);
+    color: var(--urs-text);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+    text-align: center;
+}
+
+.slot-chip:hover {
+    border-color: var(--urs-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+.slot-chip.selected {
+    background: var(--urs-slot-active);
+    border-color: var(--urs-slot-active);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+}
+
+.slot-chip .providers-count {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.85;
+    margin-top: 0.15rem;
+}
+
+/* Provider select */
+.book-provider-select {
+    background: var(--urs-input-bg);
+    border: 1.5px solid var(--urs-border);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    color: var(--urs-text);
+    font-weight: 500;
+}
+
+/* Review cards */
+.review-card {
+    background: var(--urs-slot-bg);
+    border: 1px solid var(--urs-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--urs-shadow);
+}
+
+.review-stars {
+    color: #FBBF24;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+}
+
+.review-author {
+    font-weight: 600;
+    color: var(--urs-text);
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--urs-text-muted);
+}
+
+/* Sticky summary sidebar */
+.book-summary-card {
+    position: sticky;
+    top: 1.5rem;
+    background: var(--urs-card-glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--urs-border);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: var(--urs-shadow-lg);
+}
+
+.book-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed var(--urs-border);
+    font-size: 0.95rem;
+}
+
+.book-summary-row:last-child {
+    border-bottom: none;
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 2px solid var(--urs-accent);
+}
+
+.book-summary-total {
+    color: var(--urs-accent);
+    font-size: 1.5rem !important;
+}
+
+.book-submit-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.05rem;
+    border-radius: 14px;
+    margin-top: 1rem;
+    background: var(--urs-accent);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.book-submit-btn:hover {
+    background: var(--urs-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(20, 184, 166, 0.35);
+    color: #fff;
+}
+
+/* Food / menu */
+.menu-item {
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--urs-border);
+    background: var(--urs-card);
+    color: var(--urs-text);
+}
+
+.menu-item.selected {
+    background: rgba(20, 184, 166, 0.15);
+    border-color: var(--urs-accent);
+}
+
+.food-pref-btn {
+    border-radius: 12px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+@media (max-width: 991px) {
+    .book-summary-card {
+        position: static;
+        margin-top: 1.5rem;
+    }
+}

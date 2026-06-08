@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2>Booking Confirmation</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success">
+                <h4>Thank you for your order!</h4>
+                <p>Your order has been successfully placed.</p>
+            </div>
+            
+            <h5>Order Details:</h5>
+            <ul class="list-group list-group-flush">
+                {% if booking.service %}
+                    <li class="list-group-item">
+                        <strong>Service:</strong> {{ booking.service.name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Provider:</strong> {{ booking.provider.name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Date:</strong> {{ booking.booking_date }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Time:</strong> {{ booking.booking_time }}
+                    </li>
+                {% else %}
+                    <li class="list-group-item">
+                        <strong>Dish:</strong> 
+                        {% if booking.dish %}
+                            {{ booking.dish.name }} (Vegetarian)
+                        {% else %}
+                            {{ booking.non_veg_dish.name }} (Non-Vegetarian)
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Date:</strong> {{ booking.date }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Time:</strong> {{ booking.time }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Delivery Address:</strong> {{ booking.address }}
+                    </li>
+                    {% if booking.special_instructions %}
+                    <li class="list-group-item">
+                        <strong>Special Instructions:</strong> {{ booking.special_instructions }}
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item">
+                        <strong>Total Amount:</strong> ${{ booking.total_amount }}
+                    </li>
+                {% endif %}
+                <li class="list-group-item">
+                    <strong>Status:</strong> {{ booking.status }}
+                </li>
+            </ul>
+            
+            <div class="mt-4">
+                {% if booking.service %}
+                    <a href="{% url 'services' %}" class="btn btn-primary">Back to Services</a>
+                {% else %}
+                    <a href="{% url 'cooking_services' %}" class="btn btn-primary">Back to Cooking Services</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

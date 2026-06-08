@@ -1,0 +1,502 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Cooking Services{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4" style="text-transform: uppercase;">Order Food</h1>
+    <div class="d-flex align-items-center justify-content-center mb-4" id="foodChoiceTabsRow" style="gap: 32px;">
+        <div class="text-center" id="foodTypeChoice" style="margin-bottom: 0; margin-right: 0;">
+            <div class="d-flex align-items-end justify-content-center" style="gap: 80px;">
+                <div class="veg-nonveg-col d-flex flex-column align-items-center">
+                    <div id="chooseVeg" class="veg-nonveg-icon veg-icon" tabindex="0" role="button" aria-label="Veg"></div>
+                    <span class="veg-nonveg-label veg-label">VEG</span>
+                </div>
+                <div class="veg-nonveg-col d-flex flex-column align-items-center">
+                    <div id="chooseNonVeg" class="veg-nonveg-icon nonveg-icon" tabindex="0" role="button" aria-label="Non-Veg"></div>
+                    <span class="veg-nonveg-label nonveg-label">NON-VEG</span>
+                </div>
+            </div>
+        </div>
+        <div id="foodTabsSection" style="display:none; margin-top: 0;">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" id="foodTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="veg-tab" data-bs-toggle="tab" data-bs-target="#veg" type="button" role="tab" aria-controls="veg" aria-selected="true">Veg</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="nonveg-tab" data-bs-toggle="tab" data-bs-target="#nonveg" type="button" role="tab" aria-controls="nonveg" aria-selected="false">Non-Veg</button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="veg" role="tabpanel" aria-labelledby="veg-tab">
+                    <!-- Sub-tabs for Veg -->
+                    <ul class="nav nav-pills justify-content-center mb-3" id="vegSubTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="flatbread-tab" data-bs-toggle="pill" data-bs-target="#flatbread" type="button" role="tab">Flatbreads</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="curry-tab" data-bs-toggle="pill" data-bs-target="#curry" type="button" role="tab">Curries</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="rice-tab" data-bs-toggle="pill" data-bs-target="#rice" type="button" role="tab">Rice Items</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="flatbread" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in flatbreads %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="curry" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in curries %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="rice" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in rice_items %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nonveg" role="tabpanel" aria-labelledby="nonveg-tab">
+                    <!-- Sub-tabs for Non-Veg -->
+                    <ul class="nav nav-pills justify-content-center mb-3" id="nonvegSubTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="nv-flatbread-tab" data-bs-toggle="pill" data-bs-target="#nv-flatbread" type="button" role="tab">Flatbreads</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="nv-curry-tab" data-bs-toggle="pill" data-bs-target="#nv-curry" type="button" role="tab">Curries</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="nv-rice-tab" data-bs-toggle="pill" data-bs-target="#nv-rice" type="button" role="tab">Rice Items</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="nv-flatbread" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in nv_flatbreads %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nv-curry" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in nv_curries %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/non_veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nv-rice" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-4 g-4">
+                                {% for item in nv_rice_items %}
+                                <div class="col">
+                                    <div class="card food-card h-100">
+                                        {% if item.img %}
+                                            <img src="{% static 'images/non_veg/' %}{{ item.img }}" class="card-img-top food-img" alt="{{ item.name }}">
+                                        {% else %}
+                                            <div class="food-img-placeholder">{{ item.name|slice:':1'|upper }}</div>
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column justify-content-end">
+                                            <h5 class="card-title food-title">{{ item.name }}</h5>
+                                            {% if item.price %}
+                                                <div class="food-price">₹{{ item.price }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- YOUR FOOD SECTION -->
+    <div id="yourFoodSection" class="mb-4" style="display:none;">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="mb-3">Your Food</h4>
+                <ul id="selectedFoodList" class="list-group list-group-flush">
+                    {% if selected_food and selected_food.0 %}
+                        {% for item in selected_food %}
+                            {% with parts=item|split_by:'||' %}
+                                <li class="list-group-item" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px;">
+                                    <span style="white-space: nowrap;">{{ parts.0 }}</span>
+                                    <span class="food-price-inline text-muted" style="font-size:0.95em; white-space: nowrap;">₹{{ parts.1 }}</span>
+                                </li>
+                            {% endwith %}
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item text-muted">No food items selected yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <form id="goBackForm" method="post" action="{% url 'save_food_selection' %}" class="text-center mb-5 mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="service_id" value="{{ service.id|default_if_none:'' }}">
+        <input type="hidden" name="food_items" id="selectedFoodInput">
+        <button type="submit" class="btn btn-primary btn-lg">Go Back to Booking</button>
+    </form>
+</div>
+
+<style>
+.form-check {
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.form-check-label {
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.food-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.food-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+}
+.food-img {
+    height: 180px;
+    object-fit: cover;
+}
+.food-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 1px;
+}
+.food-img-placeholder {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f44336;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    letter-spacing: 2px;
+}
+.veg-nonveg-icon {
+    width: 120px;
+    height: 120px;
+    border: 10px solid #ccc;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+    position: relative;
+    margin-bottom: 12px;
+}
+.veg-icon {
+    border-color: #19b34a;
+}
+.veg-icon::before {
+    content: '';
+    display: block;
+    width: 64px;
+    height: 64px;
+    background: #19b34a;
+    border-radius: 50%;
+}
+.nonveg-icon {
+    border-color: #f44336;
+}
+.nonveg-icon::before {
+    content: '';
+    display: block;
+    width: 64px;
+    height: 64px;
+    background: #f44336;
+    border-radius: 50%;
+}
+.veg-nonveg-icon:focus, .veg-nonveg-icon:hover {
+    box-shadow: 0 0 0 4px #e0e0e0;
+}
+.veg-nonveg-icon.active, .veg-nonveg-icon:active {
+    box-shadow: 0 0 0 4px #b2dfdb;
+}
+.veg-nonveg-label {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 0;
+    user-select: none;
+    text-align: center;
+}
+.veg-label {
+    color: #19b34a;
+}
+.nonveg-label {
+    color: #f44336;
+}
+.veg-nonveg-col {
+    min-width: 140px;
+}
+#flatbread-tab, #nv-flatbread-tab,
+#curry-tab, #nv-curry-tab,
+#rice-tab, #nv-rice-tab {
+    color: #111 !important;
+    font-weight: bold;
+}
+#flatbread-tab.active {
+    background-color: #e6f9ed !important; /* mild green */
+    color: #111 !important;
+}
+#nv-flatbread-tab.active {
+    background-color: #fdeaea !important; /* mild red */
+    color: #111 !important;
+}
+#curry-tab.active, #rice-tab.active {
+    background-color: #e6f9ed !important; /* mild green for veg */
+    color: #111 !important;
+}
+#nv-curry-tab.active, #nv-rice-tab.active {
+    background-color: #fdeaea !important; /* mild red for non-veg */
+    color: #111 !important;
+}
+.food-card.selectable {
+    border: 2px solid #2196f3;
+    box-shadow: 0 0 0 4px #bbdefb;
+    position: relative;
+}
+.food-card .food-select-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    border-radius: 50%;
+    border: 2px solid #2196f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #2196f3;
+    z-index: 2;
+}
+.food-card.selected {
+    border: 2px solid #43a047;
+    box-shadow: 0 0 0 4px #c8e6c9;
+}
+.food-card.selected .food-select-check {
+    background: #43a047;
+    color: #fff;
+    border-color: #43a047;
+}
+.food-price {
+    font-size: 0.95rem;
+    color: #888;
+    margin-top: 2px;
+    font-weight: 500;
+}
+.food-price-inline {
+    display: inline;
+    color: #888;
+    font-size: 0.95em;
+    margin-left: 6px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const foodTypeChoice = document.getElementById('foodTypeChoice');
+    const foodTabsSection = document.getElementById('foodTabsSection');
+    const vegTabBtn = document.getElementById('veg-tab');
+    const nonVegTabBtn = document.getElementById('nonveg-tab');
+    const chooseVeg = document.getElementById('chooseVeg');
+    const chooseNonVeg = document.getElementById('chooseNonVeg');
+    const yourFoodSection = document.getElementById('yourFoodSection');
+    const selectedFoodList = document.getElementById('selectedFoodList');
+    const selectedFoodInput = document.getElementById('selectedFoodInput');
+
+    // Initialize selected food items array
+    let selectedFoodItems = [];
+
+    chooseVeg.onclick = function() {
+        foodTabsSection.style.display = '';
+        vegTabBtn.click();
+        foodTypeChoice.style.display = 'none';
+    };
+    chooseNonVeg.onclick = function() {
+        foodTabsSection.style.display = '';
+        nonVegTabBtn.click();
+        foodTypeChoice.style.display = 'none';
+    };
+
+    // Make food cards selectable
+    function getAllFoodCards() {
+        return document.querySelectorAll('.food-card');
+    }
+
+    function updateYourFoodSection() {
+        selectedFoodItems = Array.from(document.querySelectorAll('.food-card.selected'))
+            .map(card => {
+                const name = card.querySelector('.food-title').textContent.trim();
+                const priceElem = card.querySelector('.food-price');
+                const price = priceElem ? priceElem.textContent.replace(/[^\d.]/g, '') : '';
+                return name + '||' + price;
+            });
+
+        // Update the display
+        selectedFoodList.innerHTML = '';
+        if (selectedFoodItems.length === 0) {
+            selectedFoodList.innerHTML = '<li class="list-group-item text-muted">No food items selected yet.</li>';
+            yourFoodSection.style.display = 'none';
+        } else {
+            selectedFoodItems.forEach(item => {
+                const [name, price] = item.split('||');
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = '<span class="food-name">' + name + '</span><br>' + (price ? '<span class="food-price-inline">₹' + price + '</span>' : '');
+                selectedFoodList.appendChild(li);
+            });
+            yourFoodSection.style.display = '';
+        }
+
+        // Update the hidden input
+        selectedFoodInput.value = selectedFoodItems.join(';');
+    }
+
+    function toggleCardSelection(card) {
+        card.classList.toggle('selected');
+        updateYourFoodSection();
+    }
+
+    // Add check icon and make cards selectable
+    getAllFoodCards().forEach(function(card) {
+        card.classList.add('selectable');
+        const check = document.createElement('div');
+        check.className = 'food-select-check';
+        check.innerHTML = '<i class="fas fa-check"></i>';
+        card.appendChild(check);
+
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('.food-select-check')) {
+                toggleCardSelection(card);
+            }
+        });
+    });
+
+    // Form submission
+    const goBackForm = document.getElementById('goBackForm');
+    if (goBackForm) {
+        goBackForm.addEventListener('submit', function(e) {
+            if (selectedFoodItems.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one food item before proceeding.');
+            }
+        });
+    }
+
+    // Initial update
+    updateYourFoodSection();
+});
+</script>
+{% endblock %}

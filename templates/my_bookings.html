@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/my_bookings.css' %}">
+
+<div class="container mt-4 booking-cards-page">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0 fw-bold">My Bookings</h2>
+        <a href="{% url 'payment_history' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-receipt me-1"></i>Payment History
+        </a>
+    </div>
+
+    {% if bookings or service_requests %}
+
+        {% if bookings %}
+        <div class="booking-cards-grid mb-4">
+            {% for booking in bookings %}
+            {% with payment=booking.payments.first %}
+            <article class="booking-card">
+                <div class="booking-card-header">
+                    <h3 class="booking-card-title">
+                        {% if booking.service %}
+                            {% if 'clean' in booking.service.name|lower or booking.service.service_type == 'cleaning' %}🧹
+                            {% elif booking.service.service_type == 'maintenance' %}🔧
+                            {% elif booking.service.service_type == 'gardening' %}🌿
+                            {% elif booking.service.service_type == 'security' %}🛡️
+                            {% elif booking.service.service_type == 'food' %}🍽️
+                            {% else %}🏠{% endif %}
+                            {{ booking.service.name }}
+                        {% elif booking.dish_type == 'veg' and booking.dish %}
+                            🍽️ {{ booking.dish.name }} (Veg)
+                        {% elif booking.dish_type == 'non_veg' and booking.non_veg_dish %}
+                            🍽️ {{ booking.non_veg_dish.name }} (Non-Veg)
+                        {% else %}
+                            🏠 Service Booking
+                        {% endif %}
+                    </h3>
+                    <p class="booking-card-sub">Booking #{{ booking.id }}</p>
+                </div>
+
+                <div class="booking-card-body">
+                    <div class="booking-badges">
+                        <span class="booking-badge badge-provider">
+                            👤 Provider: {{ booking.provider.name|default:"Not assigned yet" }}
+                        </span>
+
+                        <span class="booking-badge
+                            {% if booking.status == 'Pending' %}badge-status-pending
+                            {% elif booking.status == 'Accepted' %}badge-status-accepted
+                            {% elif booking.status == 'In Progress' %}badge-status-progress
+                            {% elif booking.status == 'Completed' %}badge-status-completed
+                            {% elif booking.status == 'Cancelled' %}badge-status-cancelled
+                            {% elif booking.status == 'Provider Assigned' %}badge-status-assigned
+                            {% else %}badge-status-default{% endif %}">
+                            {{ booking.status }}
+                        </span>
+
+                        {% if payment %}
+                        <span class="booking-badge badge-payment-mode">
+                            {% if payment.mode == 'cod' %}💵
+                            {% elif payment.mode == 'razorpay' %}🟣
+                            {% elif payment.mode == 'googlepay' or payment.mode == 'phonepe' or payment.mode == 'paytm' %}📱
+                            {% elif payment.mode == 'debitcard' or payment.mode == 'creditcard' %}💳
+                            {% else %}💰{% endif %}
+                            {{ payment.get_mode_display }}
+                        </span>
+
+                        <span class="booking-badge
+                            {% if payment.status == 'completed' %}badge-pay-paid
+                            {% elif payment.status == 'failed' %}badge-pay-failed
+                            {% else %}badge-pay-pending{% endif %}">
+                            {% if payment.status == 'completed' %}🟢 Paid
+                            {% elif payment.status == 'failed' %}🔴 Failed
+                            {% else %}🟡 {{ payment.get_status_display }}{% endif %}
+                        </span>
+                        {% else %}
+                        <span class="booking-badge badge-pay-none">No payment yet</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="booking-meta-row">
+                        <span>
+                            📅
+                            {% if booking.booking_date %}
+                                {{ booking.booking_date|date:"d F Y" }}
+                            {% elif booking.date %}
+                                {{ booking.date|date:"d F Y" }}
+                            {% else %}—{% endif %}
+                        </span>
+                        <span>
+                            🕒
+                            {% if booking.booking_time %}
+                                {{ booking.booking_time|time:"g:i A" }}
+                            {% elif booking.time %}
+                                {{ booking.time|time:"g:i A" }}
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="booking-amount">
+                        {% if booking.total_amount %}
+                            ₹{{ booking.total_amount }}
+                        {% elif booking.total_price and booking.total_price > 0 %}
+                            ₹{{ booking.total_price }}
+                        {% elif booking.service and booking.service.base_price %}
+                            ₹{{ booking.service.base_price }}
+                        {% elif booking.dish and booking.dish.price %}
+                            ₹{{ booking.dish.price }}
+                        {% elif booking.non_veg_dish and booking.non_veg_dish.price %}
+                            ₹{{ booking.non_veg_dish.price }}
+                        {% else %}
+                            ₹1,500.00
+                        {% endif %}
+                    </div>
+
+                    {% if payment and payment.transaction_id %}
+                    <div class="booking-txn">
+                        <code id="txn-{{ booking.id }}">{{ payment.transaction_id }}</code>
+                        <button type="button" class="btn btn-outline-secondary btn-copy-txn"
+                                onclick="copyTxn('txn-{{ booking.id }}', this)" title="Copy transaction ID">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    <div class="booking-timeline">
+                        <div class="timeline-step done">
+                            <span class="step-icon">✓</span>
+                            Booking Created
+                        </div>
+                        <div class="timeline-step
+                            {% if booking.status == 'Accepted' or booking.status == 'In Progress' or booking.status == 'Completed' or booking.status == 'Provider Assigned' %}done{% endif %}
+                            {% if booking.status == 'Accepted' or booking.status == 'Provider Assigned' %}current{% endif %}">
+                            <span class="step-icon">{% if booking.status == 'Accepted' or booking.status == 'In Progress' or booking.status == 'Completed' or booking.status == 'Provider Assigned' %}✓{% else %}○{% endif %}</span>
+                            Accepted
+                        </div>
+                        <div class="timeline-step
+                            {% if booking.status == 'In Progress' or booking.status == 'Completed' %}done{% endif %}
+                            {% if booking.status == 'In Progress' %}current{% endif %}">
+                            <span class="step-icon">{% if booking.status == 'In Progress' or booking.status == 'Completed' %}✓{% else %}○{% endif %}</span>
+                            In Progress
+                        </div>
+                        <div class="timeline-step
+                            {% if booking.status == 'Completed' %}done current{% endif %}">
+                            <span class="step-icon">{% if booking.status == 'Completed' %}✓{% else %}○{% endif %}</span>
+                            Completed
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-card-actions">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="modal" data-bs-target="#bookingModal{{ booking.id }}">
+                        View Details
+                    </button>
+
+                    {% if booking.status == 'Accepted' or booking.status == 'In Progress' or booking.status == 'Completed' %}
+                    <a href="{% url 'booking_chat' booking.id %}" class="btn btn-primary-action">
+                        <i class="fas fa-comments me-1"></i>Chat Provider
+                    </a>
+                    {% endif %}
+
+                    {% if booking.status == 'Completed' %}
+                        {% if booking.invoice %}
+                        <a href="{% url 'download_invoice' booking.invoice.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Invoice
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'payment_checkout' booking.id %}" class="btn btn-success">
+                            <i class="fas fa-credit-card me-1"></i>Pay Now
+                        </a>
+                        <a href="{% url 'leave_review' booking.id %}" class="btn btn-warning text-dark">
+                            ⭐ Rate Provider
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Details modal (unchanged logic) -->
+                <div class="modal fade" id="bookingModal{{ booking.id }}" tabindex="-1"
+                     aria-labelledby="bookingModalLabel{{ booking.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="bookingModalLabel{{ booking.id }}">Booking Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Provider:</strong> {{ booking.provider.name|default:"Not assigned yet" }}</p>
+                                <p><strong>Provider Phone:</strong> {{ booking.provider.phone|default:"—" }}</p>
+                                <p><strong>Service:</strong>
+                                    {% if booking.dish_type %}
+                                        {% if booking.dish_type == 'veg' and booking.dish %}
+                                            {{ booking.dish.name }} (Veg)
+                                        {% elif booking.dish_type == 'non_veg' and booking.non_veg_dish %}
+                                            {{ booking.non_veg_dish.name }} (Non-Veg)
+                                        {% else %}
+                                            {{ booking.dish_type|title }} Dish
+                                        {% endif %}
+                                    {% elif booking.service %}
+                                        {{ booking.service.name }}
+                                    {% else %}—{% endif %}
+                                </p>
+                                <p><strong>Date:</strong>
+                                    {% if booking.booking_date %}{{ booking.booking_date }}
+                                    {% elif booking.date %}{{ booking.date }}{% else %}—{% endif %}
+                                </p>
+                                <p><strong>Time:</strong>
+                                    {% if booking.booking_time %}{{ booking.booking_time }}
+                                    {% elif booking.time %}{{ booking.time }}{% else %}—{% endif %}
+                                </p>
+                                <p><strong>Status:</strong> {{ booking.status }}</p>
+                                {% if payment %}
+                                <p><strong>Payment:</strong> {{ payment.get_mode_display }} — {{ payment.get_status_display }}</p>
+                                {% if payment.transaction_id %}<p><strong>Transaction:</strong> {{ payment.transaction_id }}</p>{% endif %}
+                                {% endif %}
+                                {% if booking.address %}<p><strong>Address:</strong> {{ booking.address }}</p>{% endif %}
+                                {% if booking.notes %}<p><strong>Notes:</strong> {{ booking.notes }}</p>{% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                {% if booking.status == "Completed" %}
+                                <a href="{% url 'leave_review' booking.id %}" class="btn btn-primary">Leave a Review</a>
+                                {% endif %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endwith %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if service_requests %}
+        <h4 class="mb-3 text-muted">Service Requests</h4>
+        <div class="booking-cards-grid">
+            {% for req in service_requests %}
+            <article class="booking-card request-card">
+                <div class="booking-card-header">
+                    <h3 class="booking-card-title">
+                        {% if req.service_type == 'cleaning' %}🧹 Cleaning
+                        {% elif req.service_type == 'maintenance' %}🔧 Maintenance
+                        {% elif req.service_type == 'garden' %}🌿 Garden
+                        {% elif req.service_type == 'home_appliance' %}🔌 Home Appliance
+                        {% elif req.service_type == 'security' %}🛡️ Security
+                        {% elif req.service_type == 'food' %}🍽️ Food
+                        {% else %}📋 {{ req.service_type|title }}{% endif %}
+                    </h3>
+                    <p class="booking-card-sub">{{ req.service_name }}</p>
+                </div>
+                <div class="booking-card-body">
+                    <p class="text-muted small mb-2">{{ req.description|truncatechars:80 }}</p>
+                    <div class="booking-meta-row">
+                        <span>📅 {{ req.date|date:"d F Y" }}</span>
+                        <span>🕒 {{ req.time|time:"g:i A" }}</span>
+                    </div>
+                    <span class="booking-badge {% if req.status == 'done' %}badge-status-completed{% else %}badge-status-pending{% endif %}">
+                        {% if req.status == 'done' %}Completed{% else %}Pending{% endif %}
+                    </span>
+                </div>
+                <div class="booking-card-actions">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="modal" data-bs-target="#requestModal{{ req.id }}">
+                        View Details
+                    </button>
+                    {% if req.status == 'done' %}
+                    <button type="button" class="btn btn-success"
+                            data-booking-id="{{ req.id }}"
+                            data-amount="{% if req.price %}{{ req.price }}{% elif req.service_type == 'cleaning' %}1500{% elif req.service_type == 'maintenance' %}2000{% elif req.service_type == 'garden' %}1200{% elif req.service_type == 'home_appliance' %}1800{% elif req.service_type == 'security' %}2500{% elif req.service_type == 'food' %}1000{% else %}1500{% endif %}"
+                            data-service-name="{{ req.service_name }}"
+                            onclick="openPaymentModal(this.dataset.bookingId, this.dataset.amount, this.dataset.serviceName)">
+                        <i class="fas fa-credit-card me-1"></i>Pay Now
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="modal fade" id="requestModal{{ req.id }}" tabindex="-1"
+                     aria-labelledby="requestModalLabel{{ req.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="requestModalLabel{{ req.id }}">Request Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Service Name:</strong> {{ req.service_name }}</p>
+                                <p><strong>Description:</strong> {{ req.description }}</p>
+                                <p><strong>Date:</strong> {{ req.date }}</p>
+                                <p><strong>Time:</strong> {{ req.time }}</p>
+                                <p><strong>Status:</strong> {% if req.status == 'done' %}Done{% else %}Not Done{% endif %}</p>
+                                <p><strong>Requested on:</strong> {{ req.created_at|date:"F d, Y" }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">You haven't made any bookings or service requests yet.</div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            <i class="fas fa-home me-1"></i> Back to Home
+        </a>
+        <button type="button" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#moreHelpModal">
+            <i class="fas fa-plus-circle me-1"></i> Request New Service
+        </button>
+    </div>
+</div>
+
+<script>
+function copyTxn(elementId, btn) {
+    var el = document.getElementById(elementId);
+    if (!el) return;
+    var text = el.textContent.trim();
+    navigator.clipboard.writeText(text).then(function () {
+        var icon = btn.querySelector('i');
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-outline-secondary');
+        if (icon) icon.className = 'fas fa-check';
+        setTimeout(function () {
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+            if (icon) icon.className = 'fas fa-copy';
+        }, 1500);
+    });
+}
+</script>
+{% endblock %}

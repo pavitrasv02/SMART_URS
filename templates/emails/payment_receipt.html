@@ -1,0 +1,5 @@
+<h2>Payment Receipt — SMART URS</h2>
+<p>Hi {{ user_name }},</p>
+<p>Your payment of <strong>₹{{ payment.amount }}</strong> for <strong>{{ service_name }}</strong> was successful.</p>
+<p>Transaction ID: {{ payment.transaction_id|default:payment.razorpay_payment_id }}</p>
+<p>Thank you for choosing SMART URS!</p>

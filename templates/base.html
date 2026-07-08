@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Home Services{% endblock %}</title>
+    <title>{% block title %}SMART URS{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
@@ -49,10 +49,12 @@
         .navbar-nav .nav-link {
             color: white !important;
             transition: color 0.3s ease;
+            white-space: nowrap;
         }
 
         .navbar-nav .nav-link:hover {
             color: rgba(255,255,255,0.8) !important;
+            white-space: nowrap;
         }
 
         .navbar-dark .navbar-nav .nav-link {
@@ -116,7 +118,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" style="gap: 20px;">
                 <img src="{% static 'images/home_icon.png' %}" alt="Home" style="height: 64px; width: 64px; filter: brightness(0) invert(1); display: inline-block; vertical-align: middle;">
-                <span style="font-family: 'Atteron', serif; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem; font-weight: bold;">HOME&nbsp;SERVICES</span>
+                <span style="font-family: 'Atteron', serif; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem; font-weight: bold;">SMART&nbsp;URS</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -135,9 +137,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#moreHelpModal" style="text-transform: uppercase;">More Help</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#paymentModal" style="text-transform: uppercase;">Payment</a>
-                    </li>
+                   
                 </ul>
                 <div class="d-flex align-items-center">
                     <button type="button" id="themeToggle" class="btn btn-outline-light me-2" title="Toggle Night Sky theme" aria-label="Toggle Night Sky theme">
@@ -165,10 +165,10 @@
                             <i class="fas fa-receipt"></i>
                         </a>
                         <a class="btn btn-outline-light me-2" href="{% url 'my_bookings' %}" style="text-transform: uppercase;">
-                            <i class="fas fa-calendar-check me-1"></i>My Bookings
+                            <i class="fas fa-calendar-check me-1"></i>
                         </a>
                         <a class="btn btn-outline-light" href="{% url 'logout' %}" style="text-transform: uppercase;">
-                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            <i class="fas fa-sign-out-alt me-1"></i>
                         </a>
                     {% elif request.session.provider_id %}
                         <div class="dropdown me-2">
@@ -215,21 +215,21 @@
                         <div class="hex-content">
                             <h5>SHINE ON</h5>
                             <div class="hex-divider"></div>
-                            <a href="#">SPARKLING CLEAN</a>
+                            <a href="#" style="color: #ffffff;">SPARKLING CLEAN</a>
                         </div>
                     </div>
                     <div class="hexagon-service">
                         <div class="hex-content">
                             <h5>FIX IT FAST</h5>
                             <div class="hex-divider"></div>
-                            <a href="#">QUICK REPAIRS</a>
+                            <a href="#" style="color: #ffffff;">QUICK REPAIRS</a>
                         </div>
                     </div>
                     <div class="hexagon-service third-hex">
                         <div class="hex-content">
                             <h5>GREEN & CLEAN</h5>
                             <div class="hex-divider"></div>
-                            <a href="#"> FRESH GARDENS</a>
+                            <a href="#" style="color: #ffffff;"> FRESH GARDENS</a>
                         </div>
                     </div>
                 </div>
@@ -239,7 +239,7 @@
                         <div class="hex-content">
                             <h5>SMARTER LIVING</h5>
                             <div class="hex-divider"></div>
-                            <a href="#">HOME AUTOMATION</a>
+                            <a href="#" style="color: #ffffff;">HOME AUTOMATION</a>
                         </div>
                     </div>
                     <div class="hex-offset"></div>
@@ -249,7 +249,7 @@
                                 <div class="hex-content">
                                     <h5>SECURE & SOUND</h5>
                                     <div class="hex-divider"></div>
-                                    <a href="#">TOTAL SECURITY</a>
+                                    <a href="#" style="color: #ffffff;">TOTAL SECURITY</a>
                                 </div>
                             </div>
                                     <div class="hexagon-row" style="margin-top: -100px;">
@@ -258,7 +258,7 @@
                                             <div class="hex-content">
                                             <h5>DELICIOUS DAILY</h5>
                                     <div class="hex-divider"></div>
-                                    <a href="#">TASTY MEALS</a>
+                                    <a href="#" style="color: #ffffff;">TASTY MEALS</a>
                                 </div>
                             </div>
 
